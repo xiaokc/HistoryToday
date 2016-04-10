@@ -28,7 +28,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.1.1'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.commit451:PhotoView:1.2.5'
+    compile 'me.imid.swipebacklayout.lib:library:1.0.0'
     compile files('libs/picasso-2.5.2.jar')
-
-
+    compile 'com.android.support:support-v4:24.0.0-alpha1'
 }

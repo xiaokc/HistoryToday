@@ -4,12 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.fuxuemingzhu.findjoy.module.bigimage.BigImageActivity">
+    tools:context="com.bupt.xkc.historytoday.activitys.BigImageActivity">
 
     <uk.co.senab.photoview.PhotoView
         android:id="@+id/pv_big_image"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_big_image"

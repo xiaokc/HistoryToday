@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">HistoryToday</string>
+    <string name="app_name">历史上的今天</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="image_activity_detail">事件详情中的图片</string>
+    <string name="detail_title">事件详情的标题</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

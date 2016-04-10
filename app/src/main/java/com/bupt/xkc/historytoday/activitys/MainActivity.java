@@ -6,23 +6,31 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bupt.xkc.historytoday.R;
 import com.bupt.xkc.historytoday.adapters.EventListAdapter;
+import com.bupt.xkc.historytoday.config.APIs;
+import com.bupt.xkc.historytoday.models.HintMessage;
 import com.bupt.xkc.historytoday.models.ListModel;
 import com.bupt.xkc.historytoday.services.LoadEventListService;
 import com.bupt.xkc.historytoday.utils.DBManager;
+import com.bupt.xkc.historytoday.utils.HttpUtil;
 import com.bupt.xkc.historytoday.utils.SysApplicationManager;
 import com.bupt.xkc.historytoday.utils.TodayHelper;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -31,6 +39,12 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity {
     @Bind(R.id.recyclerview)
     RecyclerView recyclerView;
+    @Bind(R.id.no_network_tv)
+    TextView no_network_tv;
+    @Bind(R.id.no_network_cv)
+    CardView no_network_cv;
+    @Bind(R.id.refresh_layout)
+    SwipeRefreshLayout refreshLayout;
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -47,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private long exit_time = 0;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,10 +73,17 @@ public class MainActivity extends AppCompatActivity {
 
         showList();
 
-
+        doClick();
     }
 
     private void showList() {
+        //停止刷新
+        if (refreshLayout != null) {
+            refreshLayout.setRefreshing(false);
+            refreshLayout.destroyDrawingCache();
+            refreshLayout.clearAnimation();
+        }
+
         if (listModels != null) {
             listModels.clear();
         }
@@ -75,8 +97,6 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.setAdapter(adapter);
         }
 
-        doClick();
-
     }
 
     private void doClick() {
@@ -84,15 +104,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 ListModel event = listModels.get(position);
-                String e_id = event.getE_id();
                 Intent intent = new Intent(MainActivity.this,DetailActivity.class);
-                intent.putExtra("e_id",e_id);
+                intent.putExtra("e_id",event.getE_id());
+                intent.putExtra("title",event.getTitle());
                 startActivity(intent);
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                //TODO:
+                //TODO:报错/分享？
+            }
+        });
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                showList();
             }
         });
     }
@@ -105,8 +132,6 @@ public class MainActivity extends AppCompatActivity {
 
         listModels = new ArrayList<>();
         recyclerView.setLayoutManager(layoutManager);
-
-
     }
 
     private void doBackgroundService() {
@@ -140,9 +165,6 @@ public class MainActivity extends AppCompatActivity {
             } while (cursor.moveToNext());
 
         }
-//        else {
-//            Toast.makeText(this, HintMessage.NO_DATA_SHOW, Toast.LENGTH_LONG).show();
-//        }
 
         return listModels;
     }
@@ -151,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         receiver = new EventListReceiver();
-        IntentFilter filter = new IntentFilter("com.bupt.xkc.historytoday.activitys.main");
+        IntentFilter filter = new IntentFilter(HintMessage.INTENT_FILTER_MAIN);
         registerReceiver(receiver, filter);
     }
 
@@ -166,7 +188,19 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            showList();
+
+            if (! intent.hasExtra("error")) {
+                no_network_cv.setVisibility(View.GONE);
+                showList();
+                doClick();
+            }else {
+                if (intent.getStringExtra("error").equalsIgnoreCase(HintMessage.NO_NETWORK)){
+                    no_network_cv.setVisibility(View.VISIBLE);
+                    no_network_tv.setText(HintMessage.NO_NETWORK);
+
+
+                }
+            }
         }
     }
 
@@ -183,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
         if (keyCode == KeyEvent.KEYCODE_BACK
                 && event.getAction() == KeyEvent.ACTION_DOWN) {
             if (System.currentTimeMillis() - exit_time > 2000) {
-                Toast.makeText(MainActivity.this, "再按一次退出程序", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, HintMessage.READY_EXIT, Toast.LENGTH_LONG).show();
                 exit_time = System.currentTimeMillis();
 
             } else {
@@ -194,5 +228,9 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-
+    @Override
+    protected void onDestroy() {
+        dbManager.close();
+        super.onDestroy();
+    }
 }

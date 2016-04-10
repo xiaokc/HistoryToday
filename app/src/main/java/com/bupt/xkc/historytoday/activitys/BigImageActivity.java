@@ -70,6 +70,7 @@ public class BigImageActivity extends AppCompatActivity implements View.OnClickL
         attacher = new PhotoViewAttacher(photoView);
         fab_big_image.setOnClickListener(this);
 
+
         attacher.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
             @Override
             public void onPhotoTap(View view, float x, float y) {
@@ -94,11 +95,19 @@ public class BigImageActivity extends AppCompatActivity implements View.OnClickL
                     public void onImageLoadFinish(Exception e, Object o) {
                         if (e == null) {
                             File picFile = (File) o;
-                            //将图片插入到图库并
-                            // 通知图库更新
+                            //将图片插入到图库并通知图库更新
                             updateGallery(picFile);
+
                             Snackbar.make(fab_big_image,HintMessage.IMAGE_DOWNLOAD_FINISH,
-                                    Snackbar.LENGTH_LONG).show();
+                                    Snackbar.LENGTH_LONG)
+                                    .setAction("查看", new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            //TODO：Action事件为空，点击Snackbar，自身消失
+                                            fab_big_image.setVisibility(View.INVISIBLE);
+                                        }
+                                    })
+                                    .show();
                         }
 
                     }
@@ -107,6 +116,9 @@ public class BigImageActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+
+
+    //更新系统图库
     private void updateGallery(File picFile) {
         //把文件插入到系统图库
         try {

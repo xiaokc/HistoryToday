@@ -1,6 +1,8 @@
 package com.bupt.xkc.historytoday.utils;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
@@ -8,7 +10,6 @@ import com.bupt.xkc.historytoday.callbacks.LoadEventListCallback;
 import com.bupt.xkc.historytoday.config.APIs;
 import com.bupt.xkc.historytoday.models.HintMessage;
 import com.bupt.xkc.historytoday.models.ListModel;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,7 +21,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.interfaces.RSAKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -97,7 +97,7 @@ public class HttpUtil {
 
             if (reason.equalsIgnoreCase("success") && error_code == 0) {//响应成功
                 JSONArray result = object.getJSONArray("result");
-                int showCount = Math.min(result.length(), 20);//最多下载20条
+                int showCount = Math.min(result.length(), 50);//最多下载50条
                 for (int i = 0; i < showCount; i++) {
                     JSONObject event = result.getJSONObject(i);
                     String day = event.getString("day");
@@ -160,6 +160,21 @@ public class HttpUtil {
         }
 
         return map;
+    }
+
+
+    //检查是否有网络
+    public static boolean hasNetwork(Context context) {
+//        Log.i(LOG_TAG,"hasNetwork()...");
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        if (info == null || !info.isConnected()) {
+            return false;
+        }
+        if (info.isRoaming()) {
+            return true;
+        }
+        return true;
     }
 
 

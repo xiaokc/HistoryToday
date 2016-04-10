@@ -3,6 +3,7 @@ package com.bupt.xkc.historytoday.utils;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.style.UpdateAppearance;
 import android.util.Log;
 
 import com.bupt.xkc.historytoday.models.ListModel;
@@ -46,10 +47,19 @@ public class DBManager {
 
     //查询当天的事件列表
     public Cursor queryEventList(String todayDate){
-        Log.i(LOG_TAG,"====>query todayDate="+todayDate);
+//        Log.i(LOG_TAG,"====>query todayDate="+todayDate);
         cursor = db.rawQuery("select * from today_history where day = ?",new String[]{todayDate});
 
         return cursor;
+    }
+
+
+    //清空数据表，并将自增列置0
+    public void deleteAll(){
+        String delete = "delete from today_history";
+        String update= "update sqlite_sequence SET seq = 0 where name = 'today_history'";
+        db.execSQL(delete);
+        db.execSQL(update);
     }
 
     public void close(){

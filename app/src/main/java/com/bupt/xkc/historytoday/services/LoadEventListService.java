@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.bupt.xkc.historytoday.callbacks.LoadEventListCallback;
 import com.bupt.xkc.historytoday.config.APIs;
+import com.bupt.xkc.historytoday.models.HintMessage;
 import com.bupt.xkc.historytoday.models.ListModel;
 import com.bupt.xkc.historytoday.utils.DBManager;
 import com.bupt.xkc.historytoday.utils.HttpUtil;
@@ -25,7 +26,7 @@ public class LoadEventListService extends IntentService {
     public void onCreate() {
         super.onCreate();
         dbManager = new DBManager(LoadEventListService.this);
-        broadcastIntent = new Intent("com.bupt.xkc.historytoday.activitys.main");
+        broadcastIntent = new Intent(HintMessage.INTENT_FILTER_MAIN);
     }
 
     public LoadEventListService() {
@@ -43,7 +44,7 @@ public class LoadEventListService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.i(LOG_TAG,"====>onHandleIntent...");
+//        Log.i(LOG_TAG,"====>onHandleIntent...");
         String todayDate = intent.getStringExtra("today");
         requestEventList(todayDate);
 
@@ -56,31 +57,42 @@ public class LoadEventListService extends IntentService {
                 .appendQueryParameter("date",todayDate)
                 .build();
 
-        Log.i(LOG_TAG,"====>builtUri="+builtUri);
+//        Log.i(LOG_TAG,"====>builtUri="+builtUri);
 
-        HttpUtil.getEventListJson(new LoadEventListCallback() {
-            @Override
-            public void onLoadFinish(Exception e, Object result) {
-                //TODO:将json字符串解析成ListMode，并存入本地数据库
-                if (e == null) {
-                    String jsonString = (String) result;
-                    if (jsonString != null && jsonString.length() > 0) {
-                        ArrayList<ListModel> listModels = HttpUtil.getEventListFromJson(jsonString);
-                        saveEventToLocal(listModels);
-                        sendBroadcast(broadcastIntent);
+        if (HttpUtil.hasNetwork(LoadEventListService.this)) {
+            HttpUtil.getEventListJson(new LoadEventListCallback() {
+                @Override
+                public void onLoadFinish(Exception e, Object result) {
+                    //TODO:将json字符串解析成ListMode，并存入本地数据库
+                    if (e == null) {
+                        String jsonString = (String) result;
+                        if (jsonString != null && jsonString.length() > 0) {
+                            ArrayList<ListModel> listModels = HttpUtil.getEventListFromJson(jsonString);
+                            saveEventToLocal(listModels);
+                        }
                     }
-                }
 
-            }
-        }, builtUri);
+                }
+            }, builtUri);
+        }else {
+            broadcastIntent.putExtra("error", HintMessage.NO_NETWORK);
+
+        }
+
+        sendBroadcast(broadcastIntent);
+
+
     }
 
 
     private void saveEventToLocal(ArrayList<ListModel> listModels){
+        dbManager.deleteAll();
         for (int i = 0; i < listModels.size(); i ++){
             ListModel event = listModels.get(i);
             dbManager.addOneEvent(event);
         }
     }
+
+
 
 }

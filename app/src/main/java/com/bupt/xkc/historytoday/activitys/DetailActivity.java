@@ -21,6 +21,8 @@ import android.widget.Toast;
 import com.bupt.xkc.historytoday.R;
 import com.bupt.xkc.historytoday.config.APIs;
 import com.bupt.xkc.historytoday.models.HintMessage;
+import com.bupt.xkc.historytoday.swipebacklayout.lib.SwipeBackLayout;
+import com.bupt.xkc.historytoday.swipebacklayout.lib.app.SwipeBackActivity;
 import com.bupt.xkc.historytoday.utils.HttpUtil;
 import com.bupt.xkc.historytoday.utils.MyAsyncTask;
 import com.bupt.xkc.historytoday.utils.SysApplicationManager;
@@ -28,7 +30,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends SwipeBackActivity {
     private FloatingActionButton fab;
     private TextView summary_tv;
     private ImageView imageView;
@@ -44,6 +46,8 @@ public class DetailActivity extends AppCompatActivity {
 
     private LinearLayout detail_layout;
     private TextView no_network_tv;
+
+    private me.imid.swipebacklayout.lib.SwipeBackLayout swipeBackLayout;
     private final String LOG_TAG = DetailActivity.class.getSimpleName();
 
     @Override
@@ -190,6 +194,9 @@ public class DetailActivity extends AppCompatActivity {
 
         detail_layout = (LinearLayout) findViewById(R.id.detail_layout);
         no_network_tv = (TextView) findViewById(R.id.no_network_tv);
+
+        swipeBackLayout = getSwipeBackLayout();
+        swipeBackLayout.setEdgeTrackingEnabled(me.imid.swipebacklayout.lib.SwipeBackLayout.EDGE_LEFT);
 
         intent = getIntent();
         if (intent.hasExtra("e_id")) {

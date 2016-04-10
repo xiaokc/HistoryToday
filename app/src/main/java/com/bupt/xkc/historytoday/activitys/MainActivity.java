@@ -73,8 +73,11 @@ public class MainActivity extends AppCompatActivity {
 
         showList();
 
-        doClick();
+        doRefresh();
+
+
     }
+
 
     private void showList() {
         //停止刷新
@@ -97,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.setAdapter(adapter);
         }
 
+        doClick();
+
     }
 
     private void doClick() {
@@ -104,9 +109,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 ListModel event = listModels.get(position);
-                Intent intent = new Intent(MainActivity.this,DetailActivity.class);
-                intent.putExtra("e_id",event.getE_id());
-                intent.putExtra("title",event.getTitle());
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                intent.putExtra("e_id", event.getE_id());
+                intent.putExtra("title", event.getTitle());
                 startActivity(intent);
             }
 
@@ -116,6 +121,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+    }
+
+    private void doRefresh() {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -192,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
             if (! intent.hasExtra("error")) {
                 no_network_cv.setVisibility(View.GONE);
                 showList();
-                doClick();
             }else {
                 if (intent.getStringExtra("error").equalsIgnoreCase(HintMessage.NO_NETWORK)){
                     no_network_cv.setVisibility(View.VISIBLE);

@@ -50,6 +50,7 @@ public class BigImageActivity extends AppCompatActivity implements View.OnClickL
         SysApplicationManager.getInstance().addActivity(this);
 
         initOperation();
+        
 
     }
 

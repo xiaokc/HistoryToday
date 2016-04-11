@@ -27,6 +27,8 @@ import com.bupt.xkc.historytoday.utils.DBManager;
 import com.bupt.xkc.historytoday.utils.HttpUtil;
 import com.bupt.xkc.historytoday.utils.SysApplicationManager;
 import com.bupt.xkc.historytoday.utils.TodayHelper;
+import com.umeng.analytics.AnalyticsConfig;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         SysApplicationManager.getInstance().addActivity(this);
+
 
         initOperation();
 
@@ -184,12 +187,16 @@ public class MainActivity extends AppCompatActivity {
         receiver = new EventListReceiver();
         IntentFilter filter = new IntentFilter(HintMessage.INTENT_FILTER_MAIN);
         registerReceiver(receiver, filter);
+
+        MobclickAgent.onResume(this);
     }
 
     @Override
     protected void onPause() {
         unregisterReceiver(receiver);
         super.onPause();
+
+        MobclickAgent.onPause(this);
     }
 
 
@@ -229,12 +236,14 @@ public class MainActivity extends AppCompatActivity {
                 exit_time = System.currentTimeMillis();
 
             } else {
+                MobclickAgent.onKillProcess(this);
                 SysApplicationManager.getInstance().exit();
             }
             return true;
         }
         return super.onKeyDown(keyCode, event);
     }
+
 
     @Override
     protected void onDestroy() {

@@ -27,6 +27,7 @@ import com.bupt.xkc.historytoday.utils.HttpUtil;
 import com.bupt.xkc.historytoday.utils.MyAsyncTask;
 import com.bupt.xkc.historytoday.utils.SysApplicationManager;
 import com.squareup.picasso.Picasso;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.HashMap;
 
@@ -55,6 +56,8 @@ public class DetailActivity extends SwipeBackActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         SysApplicationManager.getInstance().addActivity(this);
+
+
 
         initOperation();
 
@@ -203,5 +206,18 @@ public class DetailActivity extends SwipeBackActivity {
             e_id = intent.getStringExtra("e_id");
         }
 
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 }

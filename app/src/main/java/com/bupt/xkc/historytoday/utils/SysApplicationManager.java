@@ -3,6 +3,8 @@ package com.bupt.xkc.historytoday.utils;
 import android.app.Activity;
 import android.app.Application;
 
+import com.umeng.analytics.MobclickAgent;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -21,6 +21,7 @@ import com.bupt.xkc.historytoday.models.HintMessage;
 import com.bupt.xkc.historytoday.utils.SysApplicationManager;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -90,6 +91,8 @@ public class BigImageActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab_big_image:
+                MobclickAgent.onEvent(this,"PicDownload");
+
                 downLoadPic(new LoadImageCallback() {
                     @Override
                     public void onImageLoadFinish(Exception e, Object o) {
@@ -194,6 +197,18 @@ public class BigImageActivity extends AppCompatActivity implements View.OnClickL
             }
         }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 
 

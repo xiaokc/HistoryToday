@@ -77,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
         showList();
 
         doRefresh();
-
-
     }
 
 
@@ -102,6 +100,15 @@ public class MainActivity extends AppCompatActivity {
         } else {
             recyclerView.setAdapter(adapter);
         }
+
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+
 
         doClick();
 
@@ -209,9 +216,10 @@ public class MainActivity extends AppCompatActivity {
                 no_network_cv.setVisibility(View.GONE);
                 showList();
             }else {
-                if (intent.getStringExtra("error").equalsIgnoreCase(HintMessage.NO_NETWORK)){
+                Log.i(LOG_TAG,"====>error="+intent.getStringExtra("error"));
+                if (intent.getStringExtra("error").equalsIgnoreCase(HintMessage.NETWORK_ERROR)){
                     no_network_cv.setVisibility(View.VISIBLE);
-                    no_network_tv.setText(HintMessage.NO_NETWORK);
+                    no_network_tv.setText(HintMessage.NETWORK_ERROR);
 
 
                 }

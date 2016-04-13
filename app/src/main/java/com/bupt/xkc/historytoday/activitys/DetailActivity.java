@@ -30,6 +30,7 @@ import com.squareup.picasso.Picasso;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class DetailActivity extends SwipeBackActivity {
     private FloatingActionButton fab;
@@ -56,7 +57,6 @@ public class DetailActivity extends SwipeBackActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         SysApplicationManager.getInstance().addActivity(this);
-
 
 
         initOperation();
@@ -104,12 +104,13 @@ public class DetailActivity extends SwipeBackActivity {
                     .appendQueryParameter("e_id", e_id)
                     .build();
 
-            if (HttpUtil.hasNetwork(this)) {
 
-                MyAsyncTask task = new MyAsyncTask() {
-                    @Override
-                    protected void onPostExecute(Object o) {
-                        String jsonString = (String) o;
+            MyAsyncTask task = new MyAsyncTask() {
+                @Override
+                protected void onPostExecute(Object o) {
+                    HashMap<String, Object> resultMap = (HashMap<String, Object>) o;
+                    String jsonString = (String) resultMap.get("result");
+                    if (!resultMap.containsKey("error")) {
                         if (jsonString != null && !jsonString.equalsIgnoreCase("")) {
                             HashMap<String, String> map =
                                     HttpUtil.getEventDetailFromJson(jsonString);
@@ -121,16 +122,20 @@ public class DetailActivity extends SwipeBackActivity {
                             content_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
 
                         }
-
-                        super.onPostExecute(o);
+                    } else {
+                        if (resultMap.get("error").toString()
+                                .equalsIgnoreCase(HintMessage.NETWORK_ERROR)) {
+                            detail_layout.setVisibility(View.GONE);
+                            no_network_tv.setVisibility(View.VISIBLE);
+                            no_network_tv.setText(resultMap.get("error").toString());
+                        }
                     }
-                };
-                task.execute(builtUri);
-            } else {
-                detail_layout.setVisibility(View.GONE);
-                no_network_tv.setVisibility(View.VISIBLE);
-                no_network_tv.setText(HintMessage.NO_NETWORK);
-            }
+
+                    super.onPostExecute(o);
+                }
+            };
+            task.execute(builtUri);
+
 
         }
     }

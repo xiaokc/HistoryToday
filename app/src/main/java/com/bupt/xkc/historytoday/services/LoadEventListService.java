@@ -59,7 +59,7 @@ public class LoadEventListService extends IntentService {
 
 //        Log.i(LOG_TAG,"====>builtUri="+builtUri);
 
-        if (HttpUtil.hasNetwork(LoadEventListService.this)) {
+
             HttpUtil.getEventListJson(new LoadEventListCallback() {
                 @Override
                 public void onLoadFinish(Exception e, Object result) {
@@ -70,14 +70,13 @@ public class LoadEventListService extends IntentService {
                             ArrayList<ListModel> listModels = HttpUtil.getEventListFromJson(jsonString);
                             saveEventToLocal(listModels);
                         }
+                    }else {
+                        Log.i(LOG_TAG,"====>e.getMessage="+e.getMessage());
+                        broadcastIntent.putExtra("error",e.getMessage());
                     }
 
                 }
             }, builtUri);
-        }else {
-            broadcastIntent.putExtra("error", HintMessage.NO_NETWORK);
-
-        }
 
         sendBroadcast(broadcastIntent);
 

@@ -11,6 +11,7 @@ public class HintMessage {
     public static final String IMAGE_EXIST = "图片已存在";
     public static final String IMAGE_DOWNLOAD_FINISH = "图片下载完成";
     public static final String NO_NETWORK = "未联网";
+    public static final String NETWORK_ERROR = "网络错误";
 
     public static final String READY_EXIT = "再按一次退出程序";
 

@@ -21,7 +21,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -42,37 +44,55 @@ public class HttpUtil {
 
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
+            conn.setRequestProperty("Content-Type",
+                    "application/json");
+            conn.setRequestProperty("Connection", "keep-alive");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(3000);
+            conn.setInstanceFollowRedirects(false);//不允许重定向
             conn.connect();
 
-            InputStream inputStream = conn.getInputStream();
-            if (inputStream != null) {
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-                StringBuilder builder = new StringBuilder();
+            int responseCode = conn.getResponseCode();
 
-                String line = "";
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line + "\n");
+            if (responseCode == 200) {
+                InputStream inputStream = conn.getInputStream();
+                if (inputStream != null) {
+                    reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder builder = new StringBuilder();
+
+                    String line = "";
+                    while ((line = reader.readLine()) != null) {
+                        builder.append(line + "\n");
+                    }
+
+                    if (builder.length() != 0) {
+                        jsonResult = builder.toString();
+                    }
+
                 }
 
-                if (builder.length() != 0) {
-                    jsonResult = builder.toString();
+                //接口回调
+                if (jsonResult.length() <= 0) {
+                    callback.onLoadFinish(new Exception(HintMessage.NO_DATA), jsonResult);
+                } else {
+                    callback.onLoadFinish(null, jsonResult);
                 }
 
+            }else {
+                callback.onLoadFinish(new Exception(HintMessage.NETWORK_ERROR),jsonResult);
             }
 
 //            Log.i(LOG_TAG, "====>jsonResult=" + jsonResult);
 
-            //接口回调
-            if (jsonResult.length() <= 0) {
-                callback.onLoadFinish(new Exception(HintMessage.NO_DATA), jsonResult);
-            } else {
-                callback.onLoadFinish(null, jsonResult);
-            }
-
 
         } catch (IOException e) {
+            Log.e(LOG_TAG,"====>http time out!");
+            callback.onLoadFinish(new Exception(HintMessage.NETWORK_ERROR),jsonResult);
+        } catch (Exception e){
             e.printStackTrace();
-        } finally {
+        }
+        finally {
             if (conn != null) {
                 conn.disconnect();
             }
@@ -88,7 +108,7 @@ public class HttpUtil {
 
 
     public static ArrayList<ListModel> getEventListFromJson(String jsonString) {
-//        Log.i(LOG_TAG, "====>getEventListFromJson...");
+        Log.i(LOG_TAG,"====>jsonString="+jsonString);
         ArrayList<ListModel> listModels = new ArrayList<>();
         try {
             JSONObject object = new JSONObject(jsonString);
@@ -105,6 +125,8 @@ public class HttpUtil {
                     String title = event.getString("title");
                     String e_id = event.getString("e_id");
 
+//                    String temp = TodayHelper.getTodayDate(date);
+
                     ListModel model = new ListModel(e_id, day, date, title);
                     listModels.add(model);
 
@@ -112,7 +134,7 @@ public class HttpUtil {
             }
 
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "json parse exception");
+            Log.e(LOG_TAG, "====>json parse exception:"+e.getMessage());
         }
 
         return listModels;
@@ -156,25 +178,50 @@ public class HttpUtil {
             }
 
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "getEventDetailFromJson() json exception!");
+            Log.e(LOG_TAG, "====>getEventDetailFromJson() json exception!");
         }
 
         return map;
     }
 
 
-    //检查是否有网络
+    /**
+     * 检查是否有网络，
+     * 如果手机连上wifi，但是未登录wifi认证，该情况并不能真正访问网络
+     * 但是这种方法会返回true
+     */
     public static boolean hasNetwork(Context context) {
-//        Log.i(LOG_TAG,"hasNetwork()...");
+        Log.i(LOG_TAG,"hasNetwork()...");
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = manager.getActiveNetworkInfo();
+
+        Log.i(LOG_TAG,"====>null="+(info == null)+",connected="+info.isConnected()+",available="+info.isAvailable()+",roaming="+info.isRoaming()
+        +",state="+info.getState()+",type="+info.getTypeName());
         if (info == null || !info.isConnected()) {
             return false;
-        }
-        if (info.isRoaming()) {
+        } else if (info.isAvailable() && info.isRoaming() &&
+                info.getState() == NetworkInfo.State.CONNECTED){
             return true;
         }
         return true;
+
+//        return isOnline(context);
+    }
+
+
+    public static boolean isOnline(Context context){
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        try {
+            Process process = Runtime.getRuntime().exec("ping -c 1 www.baidu.com");
+            int returnVal = process.waitFor();
+            return (returnVal==0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+
     }
 
 

@@ -18,4 +18,38 @@ public class TodayHelper {
         return todayDate;
 
     }
+
+
+    public static String getTodayDate(String date){
+        String[] todayDate = new String[3];
+
+        if (date.startsWith("前")){
+            date = date.substring(1);
+        }
+
+        if (date.startsWith("公元前")){
+            date = date.substring(3);
+        }
+
+        todayDate[0] = date.substring(0,date.indexOf('年'));
+        todayDate[1] = date.substring(date.indexOf('年') + 1, date.indexOf('月'));
+        todayDate[2] = date.substring(date.indexOf('月') + 1, date.indexOf('日'));
+
+        return todayDate[0]+"-"+todayDate[1]+"-"+todayDate[2];
+
+    }
+
+    public static int getYear(String date){
+        int year = 0;
+
+        if (date.contains("前")){
+            year = Integer.parseInt(date.substring(date.indexOf("前") + 1, date.indexOf("年"))) * -1;
+        }
+
+        return 0;
+
+
+    }
+
+
 }

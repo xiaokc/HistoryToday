@@ -48,7 +48,7 @@ public class DBManager {
     //查询当天的事件列表
     public Cursor queryEventList(String todayDate){
 //        Log.i(LOG_TAG,"====>query todayDate="+todayDate);
-        cursor = db.rawQuery("select * from today_history where day = ?",new String[]{todayDate});
+        cursor = db.rawQuery("select * from today_history where day = ? order by date desc",new String[]{todayDate});
 
         return cursor;
     }

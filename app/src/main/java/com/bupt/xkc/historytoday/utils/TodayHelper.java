@@ -1,5 +1,7 @@
 package com.bupt.xkc.historytoday.utils;
 
+import android.content.Intent;
+
 import java.util.Calendar;
 
 /**
@@ -43,12 +45,20 @@ public class TodayHelper {
         int year = 0;
 
         if (date.contains("前")){
-            year = Integer.parseInt(date.substring(date.indexOf("前") + 1, date.indexOf("年"))) * -1;
+            year = Integer.parseInt(date.substring(date.indexOf('前') + 1, date.indexOf('年'))) * -1;
+        }else {
+            year = Integer.parseInt(date.substring(0, date.indexOf('年')));
         }
 
-        return 0;
+        return year;
 
 
+    }
+
+    //将4/13转化为4月13日
+    public static String getDateDay(String date){
+        String[] temp = date.split("/");
+        return temp[0]+"月"+temp[1]+"日";
     }
 
 

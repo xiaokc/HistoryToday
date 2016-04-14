@@ -24,6 +24,7 @@ import com.bupt.xkc.historytoday.models.HintMessage;
 import com.bupt.xkc.historytoday.models.ListModel;
 import com.bupt.xkc.historytoday.services.LoadEventListService;
 import com.bupt.xkc.historytoday.utils.DBManager;
+import com.bupt.xkc.historytoday.utils.EventLoader;
 import com.bupt.xkc.historytoday.utils.HttpUtil;
 import com.bupt.xkc.historytoday.utils.SysApplicationManager;
 import com.bupt.xkc.historytoday.utils.TodayHelper;
@@ -31,6 +32,7 @@ import com.umeng.analytics.AnalyticsConfig;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -62,6 +64,11 @@ public class MainActivity extends AppCompatActivity {
     private EventListReceiver receiver;
     private long exit_time = 0;
 
+    private boolean loading = true;
+    private int pastVisibleItems,visibleItemCount,totalItemCount;
+    private int curPage = 0;//目前的页号,从第0页开始
+    private int itemCountPerPage = 5;//每页的item个数
+
 
 
     @Override
@@ -91,8 +98,10 @@ public class MainActivity extends AppCompatActivity {
         if (listModels != null) {
             listModels.clear();
         }
-        listModels = getEventListData();
+        listModels = new ArrayList<>();
+//        listModels = getEventListData();
         adapter = new EventListAdapter(this, listModels);
+        load(curPage,itemCountPerPage);
         recyclerView.setAdapter(adapter);
 
         if (listModels == null || listModels.size() <= 0) {
@@ -102,15 +111,32 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+        doLoad();
+
+        doClick();
+
+    }
+
+    private void doLoad() {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
+//                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) {
+                    visibleItemCount = layoutManager.getChildCount();
+                    totalItemCount = layoutManager.getItemCount();
+                    pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+
+                    if (loading) {
+                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                            loading = false;
+                            //TODO:pagination
+                            load(curPage,itemCountPerPage);
+                        }
+                    }
+                }
             }
         });
-
-
-        doClick();
 
     }
 
@@ -134,10 +160,52 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    //加载第page页内容
+    private void load(int page, int itemCount){
+//        int lastId = page * itemCount;
+//        Cursor curPageCursor = dbManager.queryLimit(todayDate,lastId,itemCount);
+//        if (curPageCursor != null && curPageCursor.getCount() > 0) {
+//            curPageCursor.moveToFirst();
+//            do {
+//                String day = curPageCursor.getString(curPageCursor.getColumnIndexOrThrow("day"));
+//                int year = curPageCursor.getInt(curPageCursor.getColumnIndexOrThrow("year"));
+//                String title = curPageCursor.getString(curPageCursor.getColumnIndexOrThrow("title"));
+//                String e_id = curPageCursor.getString(curPageCursor.getColumnIndexOrThrow("e_id"));
+//
+//                ListModel event = new ListModel(e_id, day, year, title);
+//                listModels.add(event);
+//
+//            } while (curPageCursor.moveToNext());
+//
+//            adapter.notifyDataSetChanged();
+//            curPage ++;
+//            loading = true;
+//        }
+
+
+        Log.i(LOG_TAG,"====>from page="+page);
+        EventLoader loader = EventLoader.getInstance(this,page,itemCount);
+        ArrayList<ListModel> loadList = loader.load();
+        for (int i = 0; i < loadList.size(); i ++){
+            listModels.add(loadList.get(i));
+        }
+
+        Log.i(LOG_TAG,"====>listModels.size="+listModels.size());
+
+        adapter.notifyDataSetChanged();
+        curPage ++;
+        loading = true;
+
+
+    }
+
+
     private void doRefresh() {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                curPage = 0;
                 showList();
             }
         });
@@ -151,6 +219,12 @@ public class MainActivity extends AppCompatActivity {
 
         listModels = new ArrayList<>();
         recyclerView.setLayoutManager(layoutManager);
+
+        //设置一个彩色的刷新进度条
+        refreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
     }
 
     private void doBackgroundService() {
@@ -173,12 +247,12 @@ public class MainActivity extends AppCompatActivity {
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
-                String day = cursor.getString(cursor.getColumnIndexOrThrow("title"));
-                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                String day = cursor.getString(cursor.getColumnIndexOrThrow("day"));
+                int year = cursor.getInt(cursor.getColumnIndexOrThrow("year"));
                 String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
                 String e_id = cursor.getString(cursor.getColumnIndexOrThrow("e_id"));
 
-                ListModel event = new ListModel(e_id, day, date, title);
+                ListModel event = new ListModel(e_id, day, year, title);
                 listModels.add(event);
 
             } while (cursor.moveToNext());
@@ -229,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * 检测返回键，连按两次返回近啊，退出程序
+     * 检测返回键，连按两次返回键，退出程序
      *
      * @param keyCode
      * @param event

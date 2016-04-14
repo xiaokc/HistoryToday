@@ -12,15 +12,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="8dp"
-        android:elevation="4dp"
         app:cardBackgroundColor="@color/white"
+        app:cardElevation="4dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
 
         <LinearLayout
             android:id="@+id/detail_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            app:cardBackgroundColor="@color/white"
+            app:cardElevation="4dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <TextView
@@ -54,12 +57,17 @@
                 android:textIsSelectable="true" />
         </LinearLayout>
 
+
         <TextView
             android:id="@+id/no_network_tv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
             android:visibility="gone"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
     </android.support.v7.widget.CardView>
+
 
 </android.support.v4.widget.NestedScrollView>

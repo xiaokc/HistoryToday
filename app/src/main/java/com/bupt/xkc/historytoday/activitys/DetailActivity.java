@@ -12,7 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -126,8 +128,15 @@ public class DetailActivity extends SwipeBackActivity {
                         if (resultMap.get("error").toString()
                                 .equalsIgnoreCase(HintMessage.NETWORK_ERROR)) {
                             detail_layout.setVisibility(View.GONE);
+
                             no_network_tv.setVisibility(View.VISIBLE);
                             no_network_tv.setText(resultMap.get("error").toString());
+
+//                            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+//                                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//                            no_network_tv.setLayoutParams(lp);
+
+
                         }
                     }
 

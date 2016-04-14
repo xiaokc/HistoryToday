@@ -20,7 +20,7 @@ public class DBHelper extends SQLiteOpenHelper {
             "create table today_history(_id integer primary key autoincrement, "
             + " e_id varchar(50),"
             + " day varchar(20), "
-            + " date date,"
+            + " year integer(10),"
             + " title varchar(200))";
 
     public DBHelper(Context context){

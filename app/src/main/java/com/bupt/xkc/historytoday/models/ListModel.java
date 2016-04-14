@@ -14,13 +14,13 @@ import java.io.Serializable;
 public class ListModel{
     private String e_id;
     private String day;
-    private String date;
+    private int  year;
     private String title;
 
-    public ListModel(String e_id, String day, String date, String title) {
+    public ListModel(String e_id, String day, int year, String title) {
         this.e_id = e_id;
         this.day = day;
-        this.date = date;
+        this.year = year;
         this.title = title;
     }
 
@@ -40,12 +40,12 @@ public class ListModel{
         this.day = day;
     }
 
-    public String getDate() {
-        return date;
+    public int getYear() {
+        return year;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setDate(int year) {
+        this.year = year;
     }
 
     public String getTitle() {

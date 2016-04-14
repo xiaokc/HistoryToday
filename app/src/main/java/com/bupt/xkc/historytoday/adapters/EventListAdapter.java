@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bupt.xkc.historytoday.R;
 import com.bupt.xkc.historytoday.models.ListModel;
+import com.bupt.xkc.historytoday.utils.TodayHelper;
 
 import java.util.ArrayList;
 
@@ -40,7 +41,14 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.View
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         ListModel event = listModels.get(position);
         holder.title_tv.setText(event.getTitle());
-        holder.date_tv.setText(event.getDate());
+        int year = event.getYear();
+        if (year < 0) {
+            holder.date_tv.setText("公元前".concat(String.valueOf(-year)).concat("年")
+                    .concat(TodayHelper.getDateDay(event.getDay())));
+        }else {
+            holder.date_tv.setText(String.valueOf(year).concat("年")
+                    .concat(TodayHelper.getDateDay(event.getDay())));
+        }
 
         if (listener != null){
             holder.event_cv.setOnClickListener(new View.OnClickListener() {

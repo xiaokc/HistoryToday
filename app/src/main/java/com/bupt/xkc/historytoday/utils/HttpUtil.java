@@ -125,10 +125,10 @@ public class HttpUtil {
                     String title = event.getString("title");
                     String e_id = event.getString("e_id");
 
-//                    String temp = TodayHelper.getTodayDate(date);
+                    int  year = TodayHelper.getYear(date);
 
-                    ListModel model = new ListModel(e_id, day, date, title);
-                    listModels.add(model);
+                    ListModel model = new ListModel(e_id, day, year, title);
+                    listModels.add(0,model);
 
                 }
             }

@@ -36,22 +36,30 @@ public class MyAsyncTask extends AsyncTask<Object,Void,Object> {
             conn.setRequestMethod("GET");
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(3000);
+            conn.setInstanceFollowRedirects(false);//不允许重定向
             conn.connect();
 
-            InputStream inputStream = conn.getInputStream();
-            if (inputStream != null) {
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-                StringBuilder builder = new StringBuilder();
+            int responseCode = conn.getResponseCode();
 
-                String line = "";
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line + "\n");
+            if (responseCode == 200) {
+
+                InputStream inputStream = conn.getInputStream();
+                if (inputStream != null) {
+                    reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder builder = new StringBuilder();
+
+                    String line = "";
+                    while ((line = reader.readLine()) != null) {
+                        builder.append(line + "\n");
+                    }
+
+                    if (builder.length() != 0) {
+                        jsonResult = builder.toString();
+                    }
+
                 }
-
-                if (builder.length() != 0) {
-                    jsonResult = builder.toString();
-                }
-
+            }else {
+                resultMap.put("error",HintMessage.NETWORK_ERROR);
             }
         }catch (IOException e) {
             Log.e(LOG_TAG,"====>http time out!");

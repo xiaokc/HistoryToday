@@ -20,9 +20,6 @@ public class EventLoader {
     private static int itemCountPerPage;
 
     private final String LOG_TAG = EventLoader.class.getSimpleName();
-
-
-
     private  EventLoader(Context context){
         init(context);
 
@@ -74,8 +71,6 @@ public class EventLoader {
 
             }
         }
-
-        Log.i(LOG_TAG,"====>page="+page);
 
         return loadList;
     }

@@ -191,7 +191,6 @@ public class HttpUtil {
      * 但是这种方法会返回true
      */
     public static boolean hasNetwork(Context context) {
-        Log.i(LOG_TAG,"hasNetwork()...");
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = manager.getActiveNetworkInfo();
 

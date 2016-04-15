@@ -183,15 +183,11 @@ public class MainActivity extends AppCompatActivity {
 //            loading = true;
 //        }
 
-
-        Log.i(LOG_TAG,"====>from page="+page);
         EventLoader loader = EventLoader.getInstance(this,page,itemCount);
         ArrayList<ListModel> loadList = loader.load();
         for (int i = 0; i < loadList.size(); i ++){
             listModels.add(loadList.get(i));
         }
-
-        Log.i(LOG_TAG,"====>listModels.size="+listModels.size());
 
         adapter.notifyDataSetChanged();
         curPage ++;

@@ -54,29 +54,35 @@ public class EventLoader {
         ArrayList<ListModel> loadList = new ArrayList<>();
 
         //如果list中的事件个数大于一页中要显示的事件条数
-        if (list.size() > itemCountPerPage){
+        if (list.size() >= itemCountPerPage){
             for (int i = 0; i < itemCountPerPage; i ++){
                 loadList.add(list.get(0));
                 list.remove(0);
             }
 
         }else {//如果个数小于一页中要显示的条数
-            if (list.size() < capacity){//此时缓存队列中的条数没有填满缓冲区（最大容量）
-                int lastId = page * itemCountPerPage;//请求的最后一个event的_id
-                ArrayList<ListModel> listFromDB = getListFromDB(lastId);
-
-                for (int i = 0; i < listFromDB.size(); i ++){
-                    list.add(listFromDB.get(i));
-                }
-
-            }
+            updateList();
         }
 
         return loadList;
     }
 
+
+    private void updateList(){
+        if (list.size() <= capacity){//此时缓存队列中的条数没有填满缓冲区（最大容量）
+            int lastId = page * itemCountPerPage;//请求的最后一个event的_id
+            ArrayList<ListModel> listFromDB = getListFromDB(lastId);
+
+            for (int i = 0; i < listFromDB.size() && i < capacity; i ++){
+                list.add(listFromDB.get(i));
+            }
+
+        }
+    }
+
+
     private  ArrayList<ListModel> getListFromDB(int lastId) {
-        Cursor cursor = dbManager.queryLimitDefaultDay(lastId,itemCountPerPage);
+        Cursor cursor = dbManager.queryDefault(lastId);
         ArrayList<ListModel> listModels = new ArrayList<>();
 
         if (cursor != null && cursor.getCount() > 0){

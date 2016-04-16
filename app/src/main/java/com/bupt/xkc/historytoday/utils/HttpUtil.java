@@ -108,7 +108,7 @@ public class HttpUtil {
 
 
     public static ArrayList<ListModel> getEventListFromJson(String jsonString) {
-        Log.i(LOG_TAG,"====>jsonString="+jsonString);
+//        Log.i(LOG_TAG,"====>jsonString="+jsonString);
         ArrayList<ListModel> listModels = new ArrayList<>();
         try {
             JSONObject object = new JSONObject(jsonString);
@@ -194,8 +194,6 @@ public class HttpUtil {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = manager.getActiveNetworkInfo();
 
-        Log.i(LOG_TAG,"====>null="+(info == null)+",connected="+info.isConnected()+",available="+info.isAvailable()+",roaming="+info.isRoaming()
-        +",state="+info.getState()+",type="+info.getTypeName());
         if (info == null || !info.isConnected()) {
             return false;
         } else if (info.isAvailable() && info.isRoaming() &&

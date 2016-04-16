@@ -47,8 +47,7 @@ public class MainActivity extends AppCompatActivity {
     TextView no_network_tv;
     @Bind(R.id.no_network_cv)
     CardView no_network_cv;
-    @Bind(R.id.refresh_layout)
-    SwipeRefreshLayout refreshLayout;
+
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -82,19 +81,10 @@ public class MainActivity extends AppCompatActivity {
         initOperation();
 
         showList();
-
-        doRefresh();
     }
 
 
     private void showList() {
-        //停止刷新
-        if (refreshLayout != null) {
-            refreshLayout.setRefreshing(false);
-            refreshLayout.destroyDrawingCache();
-            refreshLayout.clearAnimation();
-        }
-
         if (listModels != null) {
             listModels.clear();
         }
@@ -197,15 +187,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void doRefresh() {
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                curPage = 0;
-                showList();
-            }
-        });
-    }
+
 
     private void initOperation() {
         dbManager = new DBManager(MainActivity.this);
@@ -216,11 +198,6 @@ public class MainActivity extends AppCompatActivity {
         listModels = new ArrayList<>();
         recyclerView.setLayoutManager(layoutManager);
 
-        //设置一个彩色的刷新进度条
-        refreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
     }
 
     private void doBackgroundService() {

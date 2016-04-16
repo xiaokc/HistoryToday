@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 //        listModels = getEventListData();
         adapter = new EventListAdapter(this, listModels);
         load(curPage,itemCountPerPage);
-        recyclerView.setAdapter(adapter);
+//        recyclerView.setAdapter(adapter);
 
         if (listModels == null || listModels.size() <= 0) {
             doBackgroundService();

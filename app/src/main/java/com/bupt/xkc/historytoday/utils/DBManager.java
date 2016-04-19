@@ -78,8 +78,9 @@ public class DBManager {
         return cursor;
     }
 
-    public Cursor queryDefault(int lastId){
-        cursor = db.rawQuery("select * from today_history where _id > " + lastId,null);
+    public Cursor queryDefault(String todayDate, int lastId){
+        cursor = db.rawQuery("select * from today_history where _id > "
+                + lastId +" and day = " + todayDate,null);
 
         return cursor;
     }

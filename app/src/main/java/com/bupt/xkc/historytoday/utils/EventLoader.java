@@ -17,6 +17,7 @@ public class EventLoader {
     private volatile static EventLoader eventLoader;
     private DBManager dbManager;
     private static int page;
+    private static String todayDate;
     private static int itemCountPerPage;
 
     private final String LOG_TAG = EventLoader.class.getSimpleName();
@@ -39,8 +40,9 @@ public class EventLoader {
 
     }
 
-    public static EventLoader getInstance(Context context, int page, int itemCountPerPage) {
+    public static  EventLoader getInstance(Context context, int page, String todayDate,int itemCountPerPage) {
         EventLoader.page = page;
+        EventLoader.todayDate = todayDate;
         EventLoader.itemCountPerPage = itemCountPerPage;
         if (eventLoader == null) {
             synchronized (EventLoader.class) {
@@ -85,7 +87,7 @@ public class EventLoader {
 
 
     private ArrayList<ListModel> getListFromDB(int lastId) {
-        Cursor cursor = dbManager.queryDefault(lastId);
+        Cursor cursor = dbManager.queryDefault(todayDate,lastId);
         ArrayList<ListModel> listModels = new ArrayList<>();
 
         if (cursor != null && cursor.getCount() > 0) {

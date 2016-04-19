@@ -153,35 +153,35 @@ public class MainActivity extends AppCompatActivity {
 
     //加载第page页内容
     private void load(int page, int itemCount){
-//        int lastId = page * itemCount;
-//        Cursor curPageCursor = dbManager.queryLimit(todayDate,lastId,itemCount);
-//        if (curPageCursor != null && curPageCursor.getCount() > 0) {
-//            curPageCursor.moveToFirst();
-//            do {
-//                String day = curPageCursor.getString(curPageCursor.getColumnIndexOrThrow("day"));
-//                int year = curPageCursor.getInt(curPageCursor.getColumnIndexOrThrow("year"));
-//                String title = curPageCursor.getString(curPageCursor.getColumnIndexOrThrow("title"));
-//                String e_id = curPageCursor.getString(curPageCursor.getColumnIndexOrThrow("e_id"));
-//
-//                ListModel event = new ListModel(e_id, day, year, title);
-//                listModels.add(event);
-//
-//            } while (curPageCursor.moveToNext());
-//
-//            adapter.notifyDataSetChanged();
-//            curPage ++;
-//            loading = true;
-//        }
+        int lastId = page * itemCount;
+        Cursor curPageCursor = dbManager.queryLimit(todayDate,lastId,itemCount);
+        if (curPageCursor != null && curPageCursor.getCount() > 0) {
+            curPageCursor.moveToFirst();
+            do {
+                String day = curPageCursor.getString(curPageCursor.getColumnIndexOrThrow("day"));
+                int year = curPageCursor.getInt(curPageCursor.getColumnIndexOrThrow("year"));
+                String title = curPageCursor.getString(curPageCursor.getColumnIndexOrThrow("title"));
+                String e_id = curPageCursor.getString(curPageCursor.getColumnIndexOrThrow("e_id"));
 
-        EventLoader loader = EventLoader.getInstance(this,page,itemCount);
-        ArrayList<ListModel> loadList = loader.load();
-        for (int i = 0; i < loadList.size(); i ++){
-            listModels.add(loadList.get(i));
+                ListModel event = new ListModel(e_id, day, year, title);
+                listModels.add(event);
+
+            } while (curPageCursor.moveToNext());
+
+            adapter.notifyDataSetChanged();
+            curPage ++;
+            loading = true;
         }
 
-        adapter.notifyDataSetChanged();
-        curPage ++;
-        loading = true;
+//        EventLoader loader = EventLoader.getInstance(this,page,todayDate,itemCount);
+//        ArrayList<ListModel> loadList = loader.load();
+//        for (int i = 0; i < loadList.size(); i ++){
+//            listModels.add(loadList.get(i));
+//        }
+//
+//        adapter.notifyDataSetChanged();
+//        curPage ++;
+//        loading = true;
 
 
     }
